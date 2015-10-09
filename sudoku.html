@@ -1,0 +1,245 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Sudoku solver</title>
+<!-- by James Cribb, Tue 9 August 2005 -->
+
+<style type="text/css">
+  body {
+    color: black; background-color: #FFC;
+    font-family: sans-serif;
+  }
+  input.cell {
+    text-align: center;
+    border: 1px solid #CCC;
+    margin: 1px 0;
+    width: 2ex;
+  }
+  div.row3 {
+    margin-top: 0; margin-bottom: 0.5ex;
+  }
+</style>
+
+<script type="text/javascript">
+
+var  grid = new Array(81);
+function g(i, j)	{ return grid[i * 9 + j]; }
+function set_g(i, j, v)	{ grid[i * 9 + j] = v; }
+
+var  initial_values = new Array(81);
+
+function solve_puzzle(f)
+{
+  var  start = new Date().getTime();
+  for (var i = 0; i < 81; i++)
+  {
+    if (!f.c[i].value.match(/[1-9]/))
+      f.c[i].value = "";
+    f.c[i].style.color = f.c[i].value ? "" : "#F00";
+    grid[i] = initial_values[i] = f.c[i].value;
+  }
+  if (solve(0, 0))
+  {
+    for (var i = 0; i < 81; i++)
+      f.c[i].value = grid[i];
+    var  finish = new Date().getTime();
+    var  elapsed = ((finish - start) / 1000).toFixed(1);
+    alert("Solved in "+elapsed+" seconds.");
+  }
+  else
+    alert("No solution.");
+}
+
+function unsolve(f)
+{
+  for (var i = 0; i < 81; i++)
+    f.c[i].value = initial_values[i] || "";
+}
+
+function solve(i, j)
+{
+  if (i >= 9)
+    return true;
+
+  if (g(i, j))
+    return j < 8 ? solve(i, j+1) : solve(i+1, 0);
+
+  for (var v=1; v <= 9; v++)
+  {
+    if (permitted(i, j, v))
+    {
+      set_g(i, j, v);
+      if (j < 8 ? solve(i, j+1) : solve(i+1, 0))
+	return true;
+    }
+  }
+  set_g(i, j, "");
+  return false;
+}
+
+function permitted(i, j, v)
+{
+  for (var k=0; k < 9; k++)
+  {
+    if (g(i, k) == v || g(k, j) == v)
+      return false;
+
+    var  ii = i - i % 3 + Math.floor(k / 3); 
+    var  jj = j - j % 3 + k % 3; 
+    if (g(ii, jj) == v)
+      return false;
+  }
+  return true;
+}
+
+
+var  examples = [
+"6 7  9 8  4 5  71 2   645     98 371  5   2  931 76     341   8 94  2 3  7 8  6 5",
+" 7 8   933  7241  8     4 2 3  8   1 24   85 6   4  3 5 3     9  6398  571   6 8 ",
+" 6 1 4 5   83 56  2       18  4 7  6  6   3  7  9 1  45       2  72 69   4 5 8 7 "
+];
+
+function example(f, n)
+{
+  for (var i=0; i < 81; i++)
+  {
+    f.c[i].style.color = "";
+    f.c[i].value = examples[n-1].substr(i, 1);
+  }
+}
+
+// Quick data entry functions
+function key(inputField)
+{
+  if (inputField.value.match(/[0-9 ]/))
+  {
+    if (inputField.value.match(/[^1-9]/))
+      inputField.value = "";
+    var f = inputField.form;
+    for (var i = 0; i < f.elements.length; i++)
+    {
+      if (f.elements[i] == inputField)
+      {
+	f.elements[i+1].focus();
+	return;
+      }
+    }
+  }
+  else
+    inputField.value = "";
+}
+
+</script>
+
+</head><body>
+
+<h1>Sudoku solver</h1>
+
+<p>
+  Fill in the known values, then use the buttons to show or hide the solution.
+</p>
+
+<form name="p" onsubmit="return false">
+
+<div class="row3">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1"><br>
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1"><br>
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+</div>
+
+<div class="row3">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1"><br>
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1"><br>
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+</div>
+
+<div class="row3">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1"><br>
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1"><br>
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">&nbsp;
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+<input onkeyup="key(this)" class="cell" name="c" size="1" maxlength="1">
+</div>
+
+<p>
+  <input type="button" value="Solve puzzle" onclick="solve_puzzle(this.form)">
+  <input type="button" value="Undo solve" onclick="unsolve(this.form)">
+  <input type="reset" value="Clear all cells">
+</p>
+<p>
+  <input type="button" value="Load example 1" onclick="example(this.form, 1)">
+  <input type="button" value="Load example 2" onclick="example(this.form, 2)">
+  <input type="button" value="Load example 3" onclick="example(this.form, 3)">
+</p>
+
+</form>
+
+</body></html>
